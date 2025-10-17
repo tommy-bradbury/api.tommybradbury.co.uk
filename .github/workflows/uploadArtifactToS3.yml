@@ -31,11 +31,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2' # Must match your Bref layer version
-          extensions: mbstring, json
+          extensions: 'simplexml, json, mbstring, zip'
           coverage: none
-# might need this later but not now
-#      - name: Install Composer Dependencies (if using shared code)
-#        run: composer install --prefer-dist --no-dev --no-suggest
+
+      - name: Install Composer Dependencies (if using shared code)
+        run: composer require bref/bref && composer install --prefer-dist --no-dev
 
       - name: Prepare Lambda Deployment Packages
         run: |
