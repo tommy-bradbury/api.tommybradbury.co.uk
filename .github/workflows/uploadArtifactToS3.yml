@@ -33,9 +33,9 @@ jobs:
           php-version: '8.2' # Must match your Bref layer version
           extensions: mbstring, json
           coverage: none
-
-      - name: Install Composer Dependencies (if using shared code)
-        run: composer install --prefer-dist --no-dev --no-suggest
+# might need this later but not now
+#      - name: Install Composer Dependencies (if using shared code)
+#        run: composer install --prefer-dist --no-dev --no-suggest
 
       - name: Prepare Lambda Deployment Packages
         run: |
