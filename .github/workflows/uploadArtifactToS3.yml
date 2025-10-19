@@ -21,6 +21,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: prepare variables and environment
+        id: prep
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "sha_short=$SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "Captured SHA: $SHA_SHORT"
+          mkdir -p .build/auth
+
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -40,7 +49,6 @@ jobs:
 
       - name: Prepare Lambda Deployment Packages
         run: |
-          mkdir -p ./.build/auth
           cp src/auth/index.php .build/auth/
           cp src/auth/login.php .build/auth/
           cp src/auth/logout.php .build/auth/
