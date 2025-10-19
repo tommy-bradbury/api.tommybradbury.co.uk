@@ -7,7 +7,6 @@ on:
 
 env:
   PULUMI_STACK_NAME: prod
-  ARTIFACT_BUCKET: ${{ secrets.AWS_S3_BUCKET_NAME }}
   ARTIFACT_BUCKET: api.tommybradbury.co.uk
   PULUMI_CD_REPO: tommy-bradbury/api.tommybradbury.co.uk-infrastructure
 
