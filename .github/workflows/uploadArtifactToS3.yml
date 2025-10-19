@@ -41,13 +41,13 @@ jobs:
         run: |
           # 1. Package the login Lambda
           # copy the handler and Composer vendor files into tmp build dir
-          mkdir -p ./.build
-          cp src/auth ./.build/
+          mkdir -p ./.authBuild
+          cp -r src/auth ./.authBuild/
           # Bref requires vendor dir at root
-          cp -r vendor ./.build/vendor
-          zip -r auth.zip ./.build -x '*/\.*'
+          cp -r vendor ./.authBuild/vendor
+          zip -r auth.zip ./.authBuild -x '*/\.*'
       
       - name: Upload Artifacts to S3
         run: |
           # Upload them to the versioned S3 ting
-          aws s3 cp auth.zip s3://${{ env.ARTIFACT_BUCKET }}/${{ env.CODE_VERSION_KEY }}/auth.zip
+          aws s3 cp auth.zip s3://${{ env.ARTIFACT_BUCKET }}/auth.zip
