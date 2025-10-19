@@ -30,7 +30,7 @@ jobs:
       - name: Setup PHP (required for Bref/Composer)
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Must match your Bref layer version
+          php-version: '8.4' # Must match your Bref layer version
           extensions: 'simplexml, json, mbstring, zip'
           coverage: none
 
@@ -41,19 +41,13 @@ jobs:
         run: |
           # 1. Package the login Lambda
           # copy the handler and Composer vendor files into tmp build dir
-          mkdir -p ./.build/login
-          cp src/auth/login/index.php ./.build/login/
+          mkdir -p ./.build
+          cp src/auth ./.build/
           # Bref requires vendor dir at root
-          cp -r vendor ./.build/login/vendor
-          zip -r login.zip ./.build/login -x '*/\.*'
-          
-          mkdir -p ./.build/logout
-          cp src/auth/logout/index.php ./.build/logout/
-          cp -r vendor ./.build/logout/vendor
-          zip -r logout.zip ./.build/logout -x '*/\.*'
+          cp -r vendor ./.build/vendor
+          zip -r auth.zip ./.build -x '*/\.*'
       
       - name: Upload Artifacts to S3
         run: |
           # Upload them to the versioned S3 ting
-          aws s3 cp login.zip s3://${{ env.ARTIFACT_BUCKET }}/${{ env.CODE_VERSION_KEY }}/login.zip
-          aws s3 cp logout.zip s3://${{ env.ARTIFACT_BUCKET }}/${{ env.CODE_VERSION_KEY }}/logout.zip
+          aws s3 cp auth.zip s3://${{ env.ARTIFACT_BUCKET }}/${{ env.CODE_VERSION_KEY }}/auth.zip
