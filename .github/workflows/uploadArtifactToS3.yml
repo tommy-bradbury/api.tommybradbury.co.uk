@@ -1,4 +1,4 @@
-name: PHP Lambda CI/CD Deployment
+name: PHP Lambda CI Deployment
 
 on:
   push:
@@ -8,18 +8,20 @@ on:
 env:
   PULUMI_STACK_NAME: prod
   ARTIFACT_BUCKET: ${{ secrets.AWS_S3_BUCKET_NAME }}
-  # Define the version key based on the Git short SHA for uniqueness
-  # This corresponds to the 'codeVersionKey' Pulumi config setting
-  CODE_VERSION_KEY: ${{ github.sha }}/
+  ARTIFACT_BUCKET: api.tommybradbury.co.uk
+  PULUMI_CD_REPO: tommy-bradbury/api.tommybradbury.co.uk-infrastructure
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    outputs:
+      current_commit_sha: ${{ steps.prep.outputs.sha_short }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # --- AWS AUTHENTICATION ---
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -39,15 +41,30 @@ jobs:
 
       - name: Prepare Lambda Deployment Packages
         run: |
-          # 1. Package the login Lambda
-          # copy the handler and Composer vendor files into tmp build dir
-          mkdir -p ./.authBuild
-          cp -r src/auth ./.authBuild/
-          # Bref requires vendor dir at root
-          cp -r vendor ./.authBuild/vendor
-          zip -r auth.zip ./.authBuild -x '*/\.*'
-      
-      - name: Upload Artifacts to S3
+          cp auth/index.php .build/auth/
+          cp auth/login.php .build/auth/
+          cp auth/logout.php .build/auth/
+          cp -r vendor .build/auth/
+          cd .build/auth/ && zip -r ../../auth.zip .
+
+      - name: Upload auth Artifact to S3
+        id: upload_auth
         run: |
           # Upload them to the versioned S3 ting
-          aws s3 cp auth.zip s3://${{ env.ARTIFACT_BUCKET }}/auth.zip
+          S3_KEY="${{ steps.prep.outputs.sha_short }}/auth.zip"
+          aws s3 cp auth.zip s3://${{ env.ARTIFACT_BUCKET }}/$S3_KEY
+          echo "s3_key=$S3_KEY" >> $GITHUB_OUTPUT
+
+      - name: Trigger CD Pipeline in api.tommybradbury.co.uk-infrastructure
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CD_PAT }} # Uses the token defined in your secrets
+          repository: ${{ env.PULUMI_CD_REPO }}
+          event-type: new-artifact-available
+          client-payload: '{
+            "aws_region": "${{ env.AWS_REGION }}",
+            "artifact_bucket": "${{ env.ARTIFACT_BUCKET }}",
+            "meme_key": "${{ steps.upload_auth.outputs.s3_key }}",
+            "ref": "${{ github.ref }}",
+            "sha": "${{ github.sha }}"
+          }'
