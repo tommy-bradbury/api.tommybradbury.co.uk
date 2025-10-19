@@ -40,9 +40,9 @@ jobs:
 
       - name: Prepare Lambda Deployment Packages
         run: |
-          cp auth/index.php .build/auth/
-          cp auth/login.php .build/auth/
-          cp auth/logout.php .build/auth/
+          cp src/auth/index.php .build/auth/
+          cp src/auth/login.php .build/auth/
+          cp src/auth/logout.php .build/auth/
           cp -r vendor .build/auth/
           cd .build/auth/ && zip -r ../../auth.zip .
 
