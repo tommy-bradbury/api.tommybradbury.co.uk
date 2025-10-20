@@ -72,7 +72,7 @@ jobs:
           client-payload: '{
             "aws_region": "${{ env.AWS_REGION }}",
             "artifact_bucket": "${{ env.ARTIFACT_BUCKET }}",
-            "meme_key": "${{ steps.upload_auth.outputs.s3_key }}",
+            "auth_key": "${{ steps.upload_auth.outputs.s3_key }}",
             "ref": "${{ github.ref }}",
             "sha": "${{ github.sha }}"
           }'
