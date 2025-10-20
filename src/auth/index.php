@@ -6,10 +6,10 @@ $path = strtok($uri, '?');
 
 switch ($path) {
     case '/auth/login':
-        require 'login.php';
+        require __DIR__ . 'login.php';
         break;
     case '/auth/logout':
-        require 'logout.php';
+        require __DIR__ . 'logout.php';
         break;
     default:
         http_response_code(404);
