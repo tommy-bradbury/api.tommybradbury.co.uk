@@ -14,7 +14,7 @@ switch ($path) {
     default:
         http_response_code(404);
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Not Found', 'path' => $path]);
+        echo json_encode(['error' => 'Not Found lkjweyfgkuswaefygkwaseufygewafiu7yg', 'path' => $path]);
         break;
 }
 
