@@ -16,6 +16,11 @@ switch ($path) {
         header('Content-Type: application/json');
         echo json_encode(['error' => 'Fuck off Rohan', 'path' => $path]);
         break;
+    case '/auth/jason':
+        http_response_code(200);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Fuck off jason', 'path' => $path]);
+        break;
     default:
         http_response_code(404);
         header('Content-Type: application/json');
