@@ -11,7 +11,7 @@ switch ($path) {
     case '/auth/logout':
         require __DIR__ . 'logout.php';
         break;
-    case '\/auth\/rohan':
+    case '/auth/rohan':
         http_response_code(200);
         header('Content-Type: application/json');
         echo json_encode(['error' => 'Fuck off Rohan', 'path' => $path]);
