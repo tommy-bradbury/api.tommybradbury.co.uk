@@ -3,13 +3,14 @@
 require __DIR__ . '/vendor/autoload.php';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = strtok($uri, '?');
+define('AUTH_BASE', __DIR__ . '/src/auth/');
 
 switch ($path) {
     case '/auth/login':
-        require __DIR__ . 'login.php';
+        require AUTH_BASE . 'login.php';
         break;
     case '/auth/logout':
-        require __DIR__ . 'logout.php';
+        require AUTH_BASE . 'logout.php';
         break;
     case '/auth/rohan':
         http_response_code(200);
