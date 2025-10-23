@@ -14,6 +14,7 @@ class ComposerStaticInite1e18e189656dac576253c623030e1e9
         'S' => 
         array (
             'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\EventDispatcher\\' => 34,
         ),
         'R' => 
         array (
@@ -48,6 +49,10 @@ class ComposerStaticInite1e18e189656dac576253c623030e1e9
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
         ),
+        'Symfony\\Component\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
+        ),
         'Riverline\\MultiPartParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/riverline/multipart-parser/src',
@@ -58,8 +63,8 @@ class ComposerStaticInite1e18e189656dac576253c623030e1e9
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Container\\' => 
         array (
@@ -79,6 +84,27 @@ class ComposerStaticInite1e18e189656dac576253c623030e1e9
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'G' => 
+        array (
+            'Guzzle\\Tests' => 
+            array (
+                0 => __DIR__ . '/..' . '/guzzle/guzzle/tests',
+            ),
+            'Guzzle' => 
+            array (
+                0 => __DIR__ . '/..' . '/guzzle/guzzle/src',
+            ),
+        ),
+        'A' => 
+        array (
+            'Aws' => 
+            array (
+                0 => __DIR__ . '/..' . '/aws/aws-sdk-php/src',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -88,6 +114,7 @@ class ComposerStaticInite1e18e189656dac576253c623030e1e9
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInite1e18e189656dac576253c623030e1e9::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInite1e18e189656dac576253c623030e1e9::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInite1e18e189656dac576253c623030e1e9::$prefixesPsr0;
             $loader->classMap = ComposerStaticInite1e18e189656dac576253c623030e1e9::$classMap;
 
         }, null, ClassLoader::class);

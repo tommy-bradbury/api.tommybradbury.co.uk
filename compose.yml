@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  web:
+    image: bref/local-api-gateway
+    ports:
+      - '8000:8000'
+    environment:
+      TARGET: 'php:8080'
+      DOCUMENT_ROOT: .
+    volumes:
+      - .:/var/task:ro
+
+  php:
+    image: bref/php-84-fpm-dev
+    volumes:
+      - .:/var/task:ro
+    environment:
+      # CHANGE DEPENDING ON WHICH LAMBDA YOU ARE ON WITH
+      HANDLER: src/auth/index.php

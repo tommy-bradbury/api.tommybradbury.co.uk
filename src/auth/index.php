@@ -1,5 +1,16 @@
 <?php
 
+require __DIR__.'/vendor/autoload.php';
+
+// This is the simplest possible HTTP response in Bref/Lambda
+$response = new \Bref\Event\Http\HttpResponse('Hello from Bref!', [
+    'Content-Type' => 'text/plain',
+]);
+
+return $response;
+
+/**
+
 require __DIR__ . '/vendor/autoload.php';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = strtok($uri, '?');
