@@ -3,13 +3,13 @@
 require __DIR__.'/vendor/autoload.php';
 
 // This is the simplest possible HTTP response in Bref/Lambda
-$response = new \Bref\Event\Http\HttpResponse('Hello from Bref!', [
-    'Content-Type' => 'text/plain',
-]);
+//$response = new \Bref\Event\Http\HttpResponse('Hello from Bref!', [
+//    'Content-Type' => 'text/plain',
+//]);
 
-return $response;
+//return $response;
 
-/**
+
 
 require __DIR__ . '/vendor/autoload.php';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
@@ -31,7 +31,7 @@ switch ($path) {
     case '/auth/jason':
         http_response_code(200);
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Fuck off jason', 'path' => $path]);
+        echo json_encode(['error' => 'it works u cunt', 'path' => $path]);
         break;
     default:
         http_response_code(404);
