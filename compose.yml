@@ -14,6 +14,7 @@ services:
     image: bref/php-84-fpm-dev
     volumes:
       - .:/var/task:ro
+      - ./php/conf.d/:/usr/local/etc/php/conf.d/:ro
     environment:
-      # CHANGE DEPENDING ON WHICH LAMBDA YOU ARE ON WITH
       HANDLER: src/auth/index.php
+      ENVIRONMENT: development

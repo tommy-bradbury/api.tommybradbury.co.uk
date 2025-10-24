@@ -1,20 +1,18 @@
 <?php
 
-require __DIR__.'/vendor/autoload.php';
+$vendorDir = __DIR__;
+$authBase =  __DIR__ . '/src/auth/';
+if(getenv('ENVIRONMENT') === 'development')
+{
+    $vendorDir .= '/../..';
+    $authBase = './';
+}
+define('VENDOR_DIR', $vendorDir . '/vendor');
+define('AUTH_BASE',$authBase);
 
-// This is the simplest possible HTTP response in Bref/Lambda
-//$response = new \Bref\Event\Http\HttpResponse('Hello from Bref!', [
-//    'Content-Type' => 'text/plain',
-//]);
-
-//return $response;
-
-
-
-require __DIR__ . '/vendor/autoload.php';
+require VENDOR_DIR.'/autoload.php';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = strtok($uri, '?');
-define('AUTH_BASE', __DIR__ . '/src/auth/');
 
 switch ($path) {
     case '/auth/login':
