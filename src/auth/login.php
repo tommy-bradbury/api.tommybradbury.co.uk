@@ -1,10 +1,8 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
-
 use Firebase\JWT\JWT;
 
 //CORS: allow your site origin and credentials 
-$allowedOrigin = 'https://example.co.uk';
+$allowedOrigin = 'https://tommybradbury.co.uk';
 header('Vary: Origin');
 header('Access-Control-Allow-Origin: ' . $allowedOrigin);
 header('Access-Control-Allow-Credentials: true');
@@ -14,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
-header('Content-Type: application/json;
- charset=utf-8');
+header('Content-Type: application/json;');
+header('charset=utf-8');
 
 //Basic input handling 
 $raw = file_get_contents('php://input');
@@ -29,9 +27,11 @@ if (!$email || $password === '') {
 }
 
 //Connect to DB (use SSM/Secrets to load credentials securely) 
-$dsn = 'mysql:host=your-db-host;dbname=yourdb;charset=utf8mb4';
+$dbHost = getenv('DB_HOST');
+$dbName = getenv('DB_NAME');
 $dbUser = getenv('DB_USER');
 $dbPass = getenv('DB_PASS');
+$dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,];
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
@@ -39,7 +39,7 @@ try {
 
     //Avoid leaking details 
     http_response_code(503);
-    echo json_encode(['error' => 'Service unavailable']);
+    echo json_encode(['error' => 'Service unavailable gerrestghsretgh' . $e->getMessage()]);
     exit;
 }
 
@@ -48,17 +48,10 @@ $stmt = $pdo->prepare('SELECT id, password_hash FROM users WHERE email = :email 
 $stmt->execute([':email' => $email]);
 $user = $stmt->fetch();
 
-//Use a precomputed dummy hash to normalize timing if user not found.
-//Generate once offline: 
-password_hash('dummy-password-choose-long', PASSWORD_DEFAULT);
-$dummyHash = '$2y$10$hXr5XW.gm9e7QkX//0VnweSpFNR2N3lMZQ6wX2gHsxlQkTTAQvjdq';
-
-//Verify password (timing-safe path) 
-$isValid = $user ? password_verify($password, $user['password_hash']) : password_verify($password, $dummyHash);
-if (!$isValid) {
-
-    //Optional: small random delay to further blur timing 
-    usleep(random_int(10000, 40000));
+// normalize timing if user not found
+$hash = $user['password_hash'] ?? '$2y$10$hXr5XW.gm9e7QkX//0VnweSpFNR2N3lMZQ6wX2gHsxlQkTTAQvjdq';
+$isValid = password_verify($password, $hash);
+if (!$isValid) { 
     http_response_code(401);
     echo json_encode(['error' => 'Invalid credentials']);
     exit;
@@ -71,6 +64,7 @@ if ($user && password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
     try {
         $reh->execute([':h' => $newHash, ':id' => $user['id']]);
     } catch (Throwable $e) {
+        // no action
     }
 }
 
