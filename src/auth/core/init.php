@@ -10,6 +10,7 @@ if(getenv('ENVIRONMENT') === 'development')
 define('VENDOR_DIR', $vendorDir . '/vendor');
 define('AUTH_BASE',$authBase);
 require_once VENDOR_DIR.'/autoload.php';
+require_once __DIR__.'/functions.php';
 
 try {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
