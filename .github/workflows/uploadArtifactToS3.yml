@@ -66,7 +66,7 @@ jobs:
       - name: Trigger CD Pipeline in api.tommybradbury.co.uk-infrastructure
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.CD_PAT }} # Uses the token defined in your secrets
+          token: ${{ secrets.CD_PAT }}
           repository: ${{ env.PULUMI_CD_REPO }}
           event-type: new-artifact-available
           client-payload: '{

@@ -11,8 +11,9 @@ use Firebase\JWT\SignatureInvalidException;
  */
 function setAccessControl(): void
 {
+    $allowedOrigin = getenv('ENVIRONMENT') === 'development' ? 'http://localhost:3000' : 'somethingelse';
+    header("Access-Control-Allow-Origin: {$allowedOrigin}");
     header('Vary: Origin');
-    header('Access-Control-Allow-Origin: https://tommybradbury.co.uk');
     header('Access-Control-Allow-Credentials: true');
 }
 
@@ -26,7 +27,9 @@ function setAccessControl(): void
 function respond(int $httpResponseCode, array $response): never
 {
     http_response_code($httpResponseCode);
-    echo json_encode($response);
+    if(!empty($response)) {
+        echo json_encode($response);
+    }
     exit;
 }
 
@@ -37,10 +40,10 @@ function respond(int $httpResponseCode, array $response): never
  */
 function databaseConnect(): PDO
 {
-    $dbHost = getenv('DB_HOST');
-    $dbName = getenv('DB_NAME');
-    $dbUser = getenv('DB_USER');
-    $dbPass = getenv('DB_PASS');
+    $dbHost = $_ENV['DB_HOST'];
+    $dbName = $_ENV['DB_NAME'];
+    $dbUser = $_ENV['DB_USER'];
+    $dbPass = $_ENV['DB_PASS'];
     try {
         $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass,  [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     } catch(Throwable $e) {

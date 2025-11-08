@@ -1,4 +1,5 @@
 <?php
+
 use Firebase\JWT\JWT;
 
 setAccessControl();
@@ -8,9 +9,7 @@ if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
-header('Content-Type: application/json;');
-header('charset=utf-8');
-
+header('Content-Type: application/json; charset=utf-8');
 $raw        = file_get_contents('php://input');
 $data       = json_decode($raw, true);
 $email      = isset($data['email']) ? filter_var($data['email'], FILTER_VALIDATE_EMAIL) : null;
@@ -20,7 +19,7 @@ if(!isset($email, $password) || $email === false) {
 }
 
 $pdo        = databaseConnect();
-$user       = getUserByEmail($pdo, $email);
+$user       = getUser($pdo, $email, UserSearchableFields::EMAIL);
 $hash       = $user['password_hash'] ?? '$2y$10$hXr5XW.gm9e7QkX//0VnweSpFNR2N3lMZQ6wX2gHsxlQkTTAQvjdq';
 $isValid    = password_verify($password, $hash);
 if(!$isValid) {
@@ -42,12 +41,30 @@ $now = time();
 $exp = $now + 3600;
 $jti = bin2hex(random_bytes(16));
 $jwtPayload = ['iss' => 'https://api.tommybradbury.co.uk', 'aud' => 'https://tommybradbury.co.uk', 'iat' => $now, 'nbf' => $now, 'exp' => $exp, 'sub' => (string)$user['id'], 'jti' => $jti];
-$secret = getenv('APP_JWT_SECRET');
+$secret = $_ENV['APP_JWT_SECRET'];
 
 if(!$secret) {
     respond(500, ['error' => 'Server misconfiguration']);
 }
 $jwt = JWT::encode($jwtPayload, $secret, 'HS256');
 
-setcookie('session', $jwt, ['expires' => $exp, 'path' => '/', 'domain' => '.tommybradbury.co.uk', 'secure' => true, 'httponly' => true, 'samesite' => 'Strict']);
+if (headers_sent($file, $line)) {
+    die("Cannot set cookie: headers sent in $file:$line");
+}
+
+if(getenv('ENVIRONMENT') === 'development') {
+    setcookie(
+        'session',
+        $jwt,
+        ['expires' => $exp, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']
+    );
+} else {
+    setcookie(
+        'session',
+        $jwt,
+        ['expires' => $exp, 'path' => '/', 'domain' => '.tommybradbury.co.uk', 'secure' => true, 'httponly' => true, 'samesite' => 'Strict']
+    );
+
+}
 respond(200, []);
+ 
