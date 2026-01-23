@@ -1,11 +1,8 @@
 <?php
-// src/auth/index.php
-
 require __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/core/init.php';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = strtok($uri, '?');
-
 switch ($path) {
     case '/auth/signup':
         require AUTH_BASE . '/signup.php';

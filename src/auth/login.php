@@ -10,12 +10,11 @@ if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 header('Content-Type: application/json; charset=utf-8');
-$raw        = file_get_contents('php://input');
-$data       = json_decode($raw, true);
-$email      = isset($data['email']) ? filter_var($data['email'], FILTER_VALIDATE_EMAIL) : null;
-$password   = isset($data['password']) ? (string)$data['password'] : null;
+$req        = parsePOSTParameters();
+$email      = isset($req['email']) ? filter_var($req['email'], FILTER_VALIDATE_EMAIL) : null;
+$password   = isset($req['password']) ? (string)$req['password'] : null;
 if(!isset($email, $password) || $email === false) {
-    respond(400, ['error' => 'Invalid request']);
+    respond(400, ['error' => 'Invalid request', $email, $password]);
 }
 
 $pdo        = databaseConnect();

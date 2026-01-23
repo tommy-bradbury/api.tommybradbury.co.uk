@@ -18,6 +18,25 @@ function setAccessControl(): void
 }
 
 /**
+ * Parses POST parameters either as raw application/json or
+ * application/x-www-form-urlencoded and multipart/form-data
+ *
+ * @return array
+ */
+function parsePOSTParameters(): array
+{
+    $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+
+    if (stripos($contentType, 'application/json') !== false) {
+        $rawInput = file_get_contents("php://input");
+        $decoded = json_decode($rawInput, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    return $_POST;
+}
+
+/**
  * API Generate response
  *
  * @param int $httpResponseCode
