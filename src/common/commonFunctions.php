@@ -101,7 +101,6 @@ function getUser(PDO $pdo, string $searchValue, UserSearchableFields $field): ar
  * Validate  session cookie and return token
  * @param string $secret
  * @return array decoded JWT payload
- * @throws Exception If validation fails, the function directly responds.
  */
 function validateJwtCookie(string $secret): array
 {
@@ -158,4 +157,45 @@ function refreshJwtCookie(array $oldPayload, string $secret, int $durationSecond
     $newJwt = JWT::encode($newPayload, $secret, 'HS256');
     setcookie('session', $newJwt, ['expires' => $exp, 'path' => '/', 'domain' => '.tommybradbury.co.uk', 'secure' => true, 'httponly' => true, 'samesite' => 'Strict']);
 
+}
+
+/**
+ * Get location by ID or User ID
+ *
+ * @param PDO $pdo
+ * @param string|int $searchValue
+ * @param LocationSearchableFields $field
+ * @return array|false
+ */
+function getLocation(PDO $pdo, string|int $searchValue, LocationSearchableFields $field): array|false
+{
+    $stmt = false;
+    switch($field)
+    {
+        case LocationSearchableFields::ID:
+            $stmt = $pdo->prepare('SELECT * FROM locations WHERE id = :id AND deleted_at IS NULL');
+            $stmt->execute([':id' => $searchValue]);
+            break;
+        case LocationSearchableFields::USER_ID:
+            $stmt = $pdo->prepare('SELECT * FROM locations WHERE user_id = :user_id AND deleted_at IS NULL');
+            $stmt->execute([':user_id' => $searchValue]);
+            break;
+    }
+
+    $location = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $location;
+}
+
+/**
+ * Get all locations for a user
+ *
+ * @param PDO $pdo
+ * @param int $userId
+ * @return array
+ */
+function getLocationsByUserId(PDO $pdo, int $userId): array
+{
+    $stmt = $pdo->prepare('SELECT * FROM locations WHERE user_id = :user_id AND deleted_at IS NULL');
+    $stmt->execute([':user_id' => $userId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
