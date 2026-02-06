@@ -1,2 +1,4 @@
 vendor/
 src/auth/.env
+.phpunit.result.cache
+.idea/

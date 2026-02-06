@@ -18,9 +18,15 @@ $payload = validateJwtCookie($secret);
 $userId = (int)$payload['sub'];
 
 $req = parsePOSTParameters();
-$locationId = isset($req['id']) ? (int)$req['id'] : null;
 
-if(!$locationId) {
+$filters = [
+    'id' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_SCALAR]
+];
+
+$data = filter_var_array($req, $filters);
+$locationId = $data['id'];
+
+if($locationId === false || $locationId === null) {
     respond(400, ['error' => 'Location ID is required']);
 }
 

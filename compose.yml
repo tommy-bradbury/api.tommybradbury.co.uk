@@ -12,7 +12,7 @@ services:
   php:
     image: bref/php-84-fpm-dev
     volumes:
-      - .:/var/task:ro
+      - .:/var/task:rw
       - ./php/conf.d/:/usr/local/etc/php/conf.d/:ro
     environment:
       HANDLER: src/auth/index.php

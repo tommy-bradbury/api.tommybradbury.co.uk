@@ -19,8 +19,8 @@ $userId = (int)$payload['sub'];
 
 $pdo = databaseConnect();
 
-if(isset($_GET['id'])) {
-    $locationId = (int)$_GET['id'];
+$locationId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if($locationId) {
     $location = getLocation($pdo, $locationId, LocationSearchableFields::ID);
 
     if(!$location) {

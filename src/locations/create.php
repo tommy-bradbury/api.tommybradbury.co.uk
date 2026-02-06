@@ -16,11 +16,22 @@ if(!$secret) {
 
 $payload = validateJwtCookie($secret);
 $userId = (int)$payload['sub'];
+
 $req = parsePOSTParameters();
-$name = isset($req['name']) ? (string)$req['name'] : null;
-$whatthreewords = isset($req['whatthreewords']) ? (string)$req['whatthreewords'] : null;
-$latitude = isset($req['latitude']) ? (float)$req['latitude'] : null;
-$longitude = isset($req['longitude']) ? (float)$req['longitude'] : null;
+
+$filters = [
+    'name' => ['filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_FLAG_NO_ENCODE_QUOTES],
+    'whatthreewords' => ['filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_FLAG_NO_ENCODE_QUOTES],
+    'latitude' => ['filter' => FILTER_VALIDATE_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION],
+    'longitude' => ['filter' => FILTER_VALIDATE_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION]
+];
+
+$data = filter_var_array($req, $filters);
+
+$name = $data['name'] ?: null;
+$whatthreewords = $data['whatthreewords'] ?: null;
+$latitude = $data['latitude'] !== false ? $data['latitude'] : null;
+$longitude = $data['longitude'] !== false ? $data['longitude'] : null;
 
 if(empty($whatthreewords) && (empty($latitude) || empty($longitude))) {
     respond(400, ['error' => 'Either whatthreewords or coordinates (latitude and longitude) must be provided']);

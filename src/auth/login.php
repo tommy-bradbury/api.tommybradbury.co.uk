@@ -14,14 +14,19 @@ $req        = parsePOSTParameters();
 $email      = isset($req['email']) ? filter_var($req['email'], FILTER_VALIDATE_EMAIL) : null;
 $password   = isset($req['password']) ? (string)$req['password'] : null;
 if(!isset($email, $password) || $email === false) {
-    respond(400, ['error' => 'Invalid request', $email, $password]);
+    respond(400, ['error' => 'Invalid request']);
 }
 
 $pdo        = databaseConnect();
 $user       = getUser($pdo, $email, UserSearchableFields::EMAIL);
-$hash       = $user['password_hash'] ?? '$2y$10$hXr5XW.gm9e7QkX//0VnweSpFNR2N3lMZQ6wX2gHsxlQkTTAQvjdq';
+
+// Use a dummy hash if the user doesn't exist to prevent timing attacks
+$hash = $user['password_hash'] ?? '$2y$10$oBjbtlEVg1qhtvqOBi0jQ.Fd3AzmWAXqDuifxL.Cpyt.7YFNcYYcG';
+
 $isValid    = password_verify($password, $hash);
-if(!$isValid) {
+
+// Even if password_verify passed with the dummy hash, the user doesn't exist
+if(!$user || !$isValid) {
     respond(401, ['error' => 'Invalid credentials']);
 }
 
@@ -31,7 +36,7 @@ if($user && password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
     try {
         $rehash->execute([':h' => $newHash, ':id' => $user['id']]);
     } catch (Throwable $e) {
-        // no action
+        error_log('Failed to rehash password for user ' . $user['id'] . ': ' . $e->getMessage());
     }
 }
 

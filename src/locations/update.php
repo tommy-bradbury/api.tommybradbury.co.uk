@@ -18,13 +18,24 @@ $payload = validateJwtCookie($secret);
 $userId = (int)$payload['sub'];
 
 $req = parsePOSTParameters();
-$locationId = isset($req['id']) ? (int)$req['id'] : null;
-$name = isset($req['name']) ? (string)$req['name'] : null;
-$whatthreewords = isset($req['whatthreewords']) ? (string)$req['whatthreewords'] : null;
-$latitude = isset($req['latitude']) ? (float)$req['latitude'] : null;
-$longitude = isset($req['longitude']) ? (float)$req['longitude'] : null;
 
-if(!$locationId) {
+$filters = [
+    'id' => ['filter' => FILTER_VALIDATE_INT, 'flags' => FILTER_REQUIRE_SCALAR],
+    'name' => ['filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_FLAG_NO_ENCODE_QUOTES],
+    'whatthreewords' => ['filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_FLAG_NO_ENCODE_QUOTES],
+    'latitude' => ['filter' => FILTER_VALIDATE_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION],
+    'longitude' => ['filter' => FILTER_VALIDATE_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION]
+];
+
+$data = filter_var_array($req, $filters);
+
+$locationId = $data['id'];
+$name = $data['name'] ?: null;
+$whatthreewords = $data['whatthreewords'] ?: null;
+$latitude = $data['latitude'] !== false ? $data['latitude'] : null;
+$longitude = $data['longitude'] !== false ? $data['longitude'] : null;
+
+if($locationId === false || $locationId === null) {
     respond(400, ['error' => 'Location ID is required']);
 }
 

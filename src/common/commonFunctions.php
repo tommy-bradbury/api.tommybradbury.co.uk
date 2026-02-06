@@ -11,7 +11,7 @@ use Firebase\JWT\SignatureInvalidException;
  */
 function setAccessControl(): void
 {
-    $allowedOrigin = getenv('ENVIRONMENT') === 'development' ? 'http://localhost:3000' : 'somethingelse';
+    $allowedOrigin = getenv('ENVIRONMENT') === 'development' ? 'http://localhost:3000' : 'https://www.tommybradbury.co.uk';
     header("Access-Control-Allow-Origin: {$allowedOrigin}");
     header('Vary: Origin');
     header('Access-Control-Allow-Credentials: true');
@@ -89,7 +89,7 @@ function getUser(PDO $pdo, string $searchValue, UserSearchableFields $field): ar
             break;
         case UserSearchableFields::ID:
             $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
-            $stmt->execute([':email' => $searchValue]);
+            $stmt->execute([':id' => $searchValue]);
             break;
     }
 
@@ -196,6 +196,65 @@ function getLocation(PDO $pdo, string|int $searchValue, LocationSearchableFields
 function getLocationsByUserId(PDO $pdo, int $userId): array
 {
     $stmt = $pdo->prepare('SELECT * FROM locations WHERE user_id = :user_id AND deleted_at IS NULL');
+    $stmt->execute([':user_id' => $userId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Get review by ID, Location ID or User ID
+ *
+ * @param PDO $pdo
+ * @param string|int $searchValue
+ * @param ReviewSearchableFields $field
+ * @return array|false
+ */
+function getReview(PDO $pdo, string|int $searchValue, ReviewSearchableFields $field): array|false
+{
+    $stmt = false;
+    switch($field)
+    {
+        case ReviewSearchableFields::ID:
+            $stmt = $pdo->prepare('SELECT * FROM reviews WHERE id = :id AND deleted_at IS NULL');
+            $stmt->execute([':id' => $searchValue]);
+            break;
+        case ReviewSearchableFields::LOCATION_ID:
+            $stmt = $pdo->prepare('SELECT * FROM reviews WHERE location_id = :location_id AND deleted_at IS NULL');
+            $stmt->execute([':location_id' => $searchValue]);
+            break;
+        case ReviewSearchableFields::USER_ID:
+            $stmt = $pdo->prepare('SELECT * FROM reviews WHERE user_id = :user_id AND deleted_at IS NULL');
+            $stmt->execute([':user_id' => $searchValue]);
+            break;
+    }
+
+    $review = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $review;
+}
+
+/**
+ * Get all reviews for a location
+ *
+ * @param PDO $pdo
+ * @param int $locationId
+ * @return array
+ */
+function getReviewsByLocationId(PDO $pdo, int $locationId): array
+{
+    $stmt = $pdo->prepare('SELECT * FROM reviews WHERE location_id = :location_id AND deleted_at IS NULL ORDER BY created_at DESC');
+    $stmt->execute([':location_id' => $locationId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Get all reviews by a user
+ *
+ * @param PDO $pdo
+ * @param int $userId
+ * @return array
+ */
+function getReviewsByUserId(PDO $pdo, int $userId): array
+{
+    $stmt = $pdo->prepare('SELECT * FROM reviews WHERE user_id = :user_id AND deleted_at IS NULL ORDER BY created_at DESC');
     $stmt->execute([':user_id' => $userId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

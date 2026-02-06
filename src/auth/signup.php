@@ -23,7 +23,7 @@ if(!isset($email, $password) || $email === false || strlen($password) < 8) {
 
 $pdo = databaseConnect();
 if(getUser($pdo, $email, UserSearchableFields::EMAIL)) {
-    respond(409, ['error' => 'User already exists']);
+    respond(400, ['error' => 'Invalid signup data']);
 }
 
 $password_hash = password_hash($password, PASSWORD_DEFAULT);
